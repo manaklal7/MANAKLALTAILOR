@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MANAK LAL TAILOR — Ladies Suit Specialist</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home">
+        <img src="logo.png" alt="MANAK LAL TAILOR Logo" class="logo" />
+        <div class="brand-text">
+          <h1>MANAK LAL TAILOR</h1>
+          <p class="owner">Manak Lal Kumawat — <span class="subline">ladies suit specialist</span></p>
+        </div>
+      </a>
+
+      <nav class="nav">
+        <button class="nav-toggle" aria-label="menu">☰</button>
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link">HOME</a></li>
+          <li><a href="#gallery" class="nav-link">DESIGN GALLERY</a></li>
+          <li><a href="#reviews" class="nav-link">REVIEWS</a></li>
+          <li><a href="#location" class="nav-link">LOCATION</a></li>
+          <li><a href="#contact" class="nav-link">CONTACT</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Home -->
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <h2 class="hero-title">Build it exactly the way the design look</h2>
+        <p class="hero-sub">High-quality stitching • Perfect fitting • Work On Time</p>
+        <div class="cta-row">
+          <a href="#gallery" class="btn btn-primary">Design Gallery</a>
+          <a href="#contact" class="btn btn-outline">Contact Now</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery" class="section">
+      <div class="container section-inner">
+        <h3>DESIGN GALLERY</h3>
+        <p class="muted">Categories — click a category to view designs. (Images coming soon)</p>
+
+        <div class="categories">
+          <button class="cat-btn active" data-cat="blouse">Blouse design</button>
+          <button class="cat-btn" data-cat="suit">Suit design</button>
+          <button class="cat-btn" data-cat="pant">Pant-Plazo design</button>
+          <button class="cat-btn" data-cat="lehanga">Lehanga-Kurti design</button>
+          <button class="cat-btn" data-cat="gown">Gown design</button>
+          <button class="cat-btn" data-cat="others">Others</button>
+        </div>
+
+        <div id="gallery-grid" class="masonry-grid">
+          <!-- If no images available, show message -->
+          <div class="gallery-empty">
+            <h4>Gallery Updated Soon</h4>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reviews -->
+    <section id="reviews" class="section">
+      <div class="container section-inner">
+        <h3>REVIEWS</h3>
+        <p class="muted">Customers ke reviews yaha save honge (browser local storage me).</p>
+
+        <form id="review-form" class="review-form">
+          <input type="text" id="rname" placeholder="Aapka naam" required />
+          <textarea id="rtext" placeholder="Aapka review" rows="3" required></textarea>
+
+          <div class="rating-row">
+            <label>Rating:</label>
+            <select id="rrating" required>
+              <option value="5">5 — Excellent</option>
+              <option value="4">4 — Very Good</option>
+              <option value="3">3 — Good</option>
+              <option value="2">2 — Average</option>
+              <option value="1">1 — Poor</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+            <button type="button" id="clear-reviews" class="btn btn-outline">Clear All</button>
+          </div>
+        </form>
+
+        <div id="reviews-list" class="reviews-list">
+          <!-- reviews will be injected here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Location -->
+    <section id="location" class="section">
+      <div class="container section-inner">
+        <h3>LOCATION</h3>
+        <p class="muted">Click open in Google Maps for directions.</p>
+
+        <div class="location-wrap">
+          <!-- Basic embed (replace with official embed code if available) -->
+          <iframe
+            id="gmap-embed"
+            title="Manak Lal Tailor Location"
+            src="https://www.google.com/maps?q=Manak+Lal+Tailor&output=embed"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+
+          <div class="map-actions">
+            <a class="btn btn-primary" href="https://maps.app.goo.gl/swL9J47ShTFFCeZf9" target="_blank" rel="noopener">Open in Google Maps</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section">
+      <div class="container section-inner contact-inner">
+        <h3>CONTACT</h3>
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h4>Call / Message</h4>
+            <p class="muted">Phone:</p>
+            <a class="phone-link" href="tel:+919252006991">+91 92520 06991</a>
+
+            <p class="muted">WhatsApp:</p>
+            <a class="btn btn-whatsapp" target="_blank" rel="noopener"
+               href="https://api.whatsapp.com/send?phone=919252006991&text=Namaste%2C%20mujhe%20design%20ke%20bare%20me%20puchna%20tha%3F">
+               Message on WhatsApp
+            </a>
+          </div>
+
+          <div class="contact-card">
+            <h4>TIMING</h4>
+            <p>Mon–Sun: 10:00 AM — 8:00 PM</p>
+        
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> MANAK LAL TAILOR • Designed with care</p>
+    </div>
+  </footer>
+
+  <!-- IMAGE LIGHTBOX & DOWNLOAD -->
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <div class="lightbox-backdrop"></div>
+    <div class="lightbox-content">
+      <button class="lb-close" aria-label="close">✕</button>
+      <img id="lb-img" src="" alt="Zoomed design" />
+      <div class="lb-actions">
+        <a id="lb-download" download class="btn">Download</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
