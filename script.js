@@ -1,136 +1,119 @@
-/* Main JS for MANAK LAL TAILOR website */
-/* --- Basic dom helpers --- */
+/* Responsive JS improvements + existing functionality */
+
+/* Short helpers */
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 
 /* Set current year */
-document.getElementById('year').textContent = new Date().getFullYear();
+const yEl = document.getElementById('year');
+if(yEl) yEl.textContent = new Date().getFullYear();
 
-/* Mobile nav toggle */
+/* Mobile nav toggle (improved ARIA) */
 const navToggle = document.querySelector('.nav-toggle');
 const navList = document.querySelector('.nav-list');
-navToggle?.addEventListener('click', () => {
-  navList.classList.toggle('open');
-});
 
-/* Smooth page nav + glow animation on click */
+if(navToggle && navList){
+  navToggle.setAttribute('aria-expanded', 'false');
+  navToggle.addEventListener('click', () => {
+    const open = navList.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // close nav when clicking outside
+  document.addEventListener('click', (e) => {
+    if(!navList.contains(e.target) && !navToggle.contains(e.target) && navList.classList.contains('open')){
+      navList.classList.remove('open');
+      navToggle.setAttribute('aria-expanded','false');
+    }
+  });
+}
+
+/* Smooth nav scrolling (no layout shift) */
 document.querySelectorAll('.nav-link').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
-    document.querySelector(link.getAttribute('href')).scrollIntoView({behavior:'smooth'});
-    // glow effect
-    link.classList.add('active-glow');
-    setTimeout(()=> link.classList.remove('active-glow'), 800);
-  });
-});
-
-/* Gallery categories & masonry behavior */
-/* We show a placeholder "Gallery Updated Soon" until images are provided.
-   When images are added later, they should be inserted as <div class="masonry-item"><img src="path" alt=""></div>
-*/
-const galleryGrid = document.getElementById('gallery-grid');
-const galleryEmpty = galleryGrid.querySelector('.gallery-empty');
-
-function clearGallery() {
-  galleryGrid.innerHTML = '';
-}
-function showGalleryPlaceholder() {
-  galleryGrid.innerHTML = '';
-  galleryGrid.appendChild(galleryEmpty);
-}
-
-// Initialize with placeholder
-showGalleryPlaceholder();
-
-/* Example helper if you later want to programmatically insert images:
-   addImagesToCategory('blouse', ['img1.jpg','img2.jpg' ...]);
-*/
-function addImagesToCategory(cat, imageUrls=[]) {
-  // Remove placeholder if present
-  if (galleryGrid.contains(galleryEmpty)) galleryGrid.removeChild(galleryEmpty);
-
-  imageUrls.forEach(url => {
-    const item = document.createElement('div');
-    item.className = 'masonry-item';
-    item.innerHTML = `
-      <img src="${url}" alt="${cat} design" loading="lazy" />
-    `;
-    galleryGrid.appendChild(item);
-  });
-  enableGalleryClicks(); // enable lightbox for newly added images
-}
-
-/* Category buttons (switching UI - currently no separate images per category stored) */
-$$('.cat-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    $$('.cat-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    // If you later store per-category images, you can load them here.
-    // For now, we just show placeholder if no images.
-    if (galleryGrid.children.length === 0 || galleryGrid.contains(galleryEmpty)) {
-      showGalleryPlaceholder();
+    const target = document.querySelector(link.getAttribute('href'));
+    if(target){
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    // close mobile nav after clicking
+    if(navList && navList.classList.contains('open')){
+      navList.classList.remove('open');
+      navToggle?.setAttribute('aria-expanded','false');
     }
   });
 });
 
-/* Lightbox (zoom) + download function */
-const lightbox = $('#lightbox');
-const lbImg = $('#lb-img');
-const lbDownload = $('#lb-download');
-const lbClose = $('.lb-close');
-
-function enableGalleryClicks() {
-  document.querySelectorAll('.masonry-item img').forEach(img => {
-    // add pointer style
-    img.style.cursor = 'zoom-in';
-    img.addEventListener('click', () => {
-      openLightbox(img.src);
-    });
-  });
+/* GALLERY: keep placeholder until images inserted */
+const galleryGrid = document.getElementById('gallery-grid');
+const placeholderHtml = `
+  <div class="gallery-empty">
+    <h4>Gallery Updated Soon</h4>
+    <p>हम जल्द ही यहाँ पर designs के images अपलोड कर देंगे — तब तक संपर्क करें।</p>
+  </div>
+`;
+if(galleryGrid && galleryGrid.innerHTML.trim() === ''){
+  galleryGrid.innerHTML = placeholderHtml;
 }
 
-function openLightbox(src) {
+/* Masonry item click -> lightbox */
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lb-img');
+const lbDownload = document.getElementById('lb-download');
+const lbClose = document.querySelector('.lb-close');
+
+function enableGalleryClicks(){
+  document.querySelectorAll('.masonry-item img').forEach(img => {
+    img.style.cursor = 'zoom-in';
+    img.removeEventListener('click', img._clickHandler); // remove old
+    const handler = () => openLightbox(img.src);
+    img.addEventListener('click', handler);
+    img._clickHandler = handler;
+  });
+}
+function openLightbox(src){
+  if(!lightbox) return;
   lbImg.src = src;
   lbDownload.href = src;
   lbDownload.setAttribute('download', src.split('/').pop() || 'design.jpg');
   lightbox.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 }
-function closeLightbox() {
+function closeLightbox(){
+  if(!lightbox) return;
   lightbox.setAttribute('aria-hidden','true');
-  lbImg.src = '';
-  document.body.style.overflow = '';
+  if(lbImg) lbImg.src = '';
+  document.documentElement.style.overflow = '';
 }
-lbClose?.addEventListener('click', closeLightbox);
-lightbox.querySelector('.lightbox-backdrop').addEventListener('click', closeLightbox);
+if(lbClose) lbClose.addEventListener('click', closeLightbox);
+if(lightbox){
+  const backdrop = lightbox.querySelector('.lightbox-backdrop');
+  backdrop?.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && lightbox.getAttribute('aria-hidden') === 'false') closeLightbox();
+  });
+}
 
-/* Reviews system — localStorage */
+/* Reviews localStorage (unchanged core logic) */
 const REV_KEY = 'manaklal_reviews_v1';
 const reviewForm = document.getElementById('review-form');
 const reviewsList = document.getElementById('reviews-list');
 const clearBtn = document.getElementById('clear-reviews');
 
 function getReviews(){
-  try {
-    const raw = localStorage.getItem(REV_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch(e){
-    return [];
-  }
+  try { return JSON.parse(localStorage.getItem(REV_KEY)) || []; } catch(e){ return []; }
 }
-function saveReviews(arr){
-  localStorage.setItem(REV_KEY, JSON.stringify(arr));
-}
+function saveReviews(arr){ localStorage.setItem(REV_KEY, JSON.stringify(arr)); }
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]); }
+
 function renderReviews(){
+  if(!reviewsList) return;
   const reviews = getReviews();
   reviewsList.innerHTML = '';
   if(reviews.length === 0){
     reviewsList.innerHTML = `<div class="review-card text-center"><em>No reviews yet — be the first to share your experience!</em></div>`;
     return;
   }
-
-  // show average
   const avg = (reviews.reduce((s,r)=> s + Number(r.rating),0) / reviews.length).toFixed(1);
   const avgCard = document.createElement('div');
   avgCard.className = 'review-card';
@@ -152,22 +135,16 @@ function renderReviews(){
   });
 }
 
-function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]);
-}
-
 reviewForm?.addEventListener('submit', e => {
   e.preventDefault();
-  const name = $('#rname').value.trim();
-  const text = $('#rtext').value.trim();
-  const rating = $('#rrating').value;
+  const name = document.getElementById('rname').value.trim();
+  const text = document.getElementById('rtext').value.trim();
+  const rating = document.getElementById('rrating').value;
   if(!name || !text) return alert('कृपया नाम और review भरें।');
-
   const reviews = getReviews();
   reviews.push({name, text, rating:Number(rating), time: Date.now()});
   saveReviews(reviews);
   renderReviews();
-
   reviewForm.reset();
 });
 
@@ -178,21 +155,8 @@ clearBtn?.addEventListener('click', () => {
   }
 });
 
-/* initial render */
+/* Finalize: enable gallery clicks and render reviews */
+enableGalleryClicks();
 renderReviews();
 
-/* If someone later programmatically wants to add demo images for testing, uncomment example:
-addImagesToCategory('blouse', [
-  'https://picsum.photos/seed/b1/800/1000',
-  'https://picsum.photos/seed/b2/800/1100',
-  'https://picsum.photos/seed/b3/800/900'
-]);
-*/
-
-/* Accessibility helper: close lightbox on Escape */
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape' && lightbox.getAttribute('aria-hidden') === 'false') closeLightbox();
-});
-
-/* Enable gallery clicks if images already present on load */
-enableGalleryClicks();
+/* If you later programmatically add images with addImagesToCategory, call enableGalleryClicks() after insertion. */
